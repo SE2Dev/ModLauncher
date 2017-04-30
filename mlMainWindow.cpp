@@ -562,13 +562,13 @@ void mlMainWindow::PopulateFileList()
 	QStringList Mods = QDir(ModsFolder).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	QTreeWidgetItem* ModsRootItem = new QTreeWidgetItem(mFileListWidget, QStringList() << "Mods");
 	ModsRootItem->setFont(0, Font);
-	const char* Files[4] = { "core_mod", "mp_mod", "cp_mod", "zm_mod" };
+	const char* Files[3] = { "core_mod", "mp_mod", "zm_mod" };
 
 	for (QString ModName : Mods)
 	{
 		QTreeWidgetItem* ParentItem = NULL;
 
-		for (int FileIdx = 0; FileIdx < 4; FileIdx++)
+		for (int FileIdx = 0; FileIdx < 3; FileIdx++)
 		{
 			QString ZoneFileName = QString("%1/%2/zone_source/%3.zone").arg(ModsFolder, ModName, Files[FileIdx]);
 
