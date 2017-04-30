@@ -655,7 +655,7 @@ void mlMainWindow::OnFileExport2Bin()
 void mlMainWindow::OnFileNew()
 {
 	QDir TemplatesFolder(QString("%1/rex/templates").arg(mToolsPath));
-	QStringList Templates = TemplatesFolder.entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+	QStringList Templates = TemplatesFolder.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 
 	if (Templates.isEmpty())
 	{
@@ -701,7 +701,7 @@ void mlMainWindow::OnFileNew()
 
 	if (Name.isEmpty())
 	{
-		QMessageBox::information(this, "Error", "Map name cannot be empty.");
+		QMessageBox::information(this, "Error", "Name cannot be empty.");
 		return;
 	}
 
@@ -716,9 +716,9 @@ void mlMainWindow::OnFileNew()
 
 	QString Template = Templates[TemplateWidget->currentIndex()];
 
-	if ((Template == "MP Mod Level" && !MapName.startsWith("mp_")) || (Template == "ZM Mod Level" && !MapName.startsWith("zm_")))
+	if (Template.contains("Mod Level") && !MapName.startsWith(Template.mid(0,2).toLower().toUtf8() + "_"))
 	{
-		QMessageBox::information(this, "Error", "Map name must start with 'mp_' or 'zm_'.");
+		QMessageBox::information(this, "Error", "Map name must start with '" + Template.mid(0,2).toLower().toUtf8() + "_'.");
 		return;
 	}
 
@@ -815,7 +815,6 @@ void mlMainWindow::OnEditBuild()
 	QString LastMap, LastMod;
 
 	QStringList LanguageArgs;
-	LanguageArgs;
 
 	if (mBuildLanguage != "All")
 		LanguageArgs << "-language" << mBuildLanguage;
