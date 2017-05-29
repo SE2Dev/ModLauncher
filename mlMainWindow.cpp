@@ -328,12 +328,11 @@ mlMainWindow::mlMainWindow()
 
 	ActionsLayout->addStretch(1);
 
-	mOutputWidget = new QTextEdit(this);
-	mOutputWidget->setReadOnly(true);
+	mOutputWidget = new QPlainTextEdit(this);
 	CentralWidget->addWidget(mOutputWidget);
 
 	setCentralWidget(CentralWidget);
-	// TODO: add ZC maps
+
 	mShippedMapList << "mp_aerospace" <<  "mp_apartments" << "mp_arena" << "mp_banzai" << "mp_biodome" << "mp_chinatown" << "mp_city" << "mp_conduit" << "mp_crucible" << "mp_cryogen" << "mp_ethiopia" << "mp_freerun_01" << "mp_freerun_02" << "mp_freerun_03" << "mp_freerun_04" << "mp_havoc" << "mp_infection" << "mp_kung_fu" << "mp_metro" << "mp_miniature" << "mp_nuketown_x" << "mp_redwood" << "mp_rise" << "mp_rome" << "mp_ruins" << "mp_sector" << "mp_shrine" << "mp_skyjacked" << "mp_spire" << "mp_stronghold" << "mp_veiled" << "mp_waterpark" << "mp_western" << "zm_castle" << "zm_factory" << "zm_genesis" << "zm_island" << "zm_levelcommon" << "zm_stalingrad" << "zm_zod";
 
 	Settings.beginGroup("MainWindow");
@@ -1542,7 +1541,7 @@ void mlMainWindow::OnExport2BinToggleOverwriteFiles()
 
 void mlMainWindow::BuildOutputReady(QString Output)
 {
-	mOutputWidget->append(Output);
+	mOutputWidget->appendPlainText(Output);
 }
 
 void mlMainWindow::BuildFinished()

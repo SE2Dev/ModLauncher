@@ -146,7 +146,7 @@ protected:
 	QAction* mActionHelpAbout;
 
 	QTreeWidget* mFileListWidget;
-	QTextEdit* mOutputWidget;
+	QPlainTextEdit* mOutputWidget;
 
 	QPushButton* mBuildButton;
 	QPushButton* mDvarsButton;
