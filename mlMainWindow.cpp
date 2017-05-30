@@ -26,6 +26,8 @@ const int AppId = 311210;
 
 const char* gLanguages[] = { "english", "french", "italian", "spanish", "german", "portuguese", "russian", "polish", "japanese", "traditionalchinese", "simplifiedchinese", "englisharabic" };
 const char* gTags[] = { "Animation", "Audio", "Character", "Map", "Mod", "Mode", "Model", "Multiplayer", "Scorestreak", "Skin", "Specialist", "Texture", "UI", "Vehicle", "Visual Effect", "Weapon", "WIP", "Zombies" };
+const char* gAssetTypes[] = { "addon_map_ents" , "aimtable" , "aitype" , "animmappingtable" , "animselectortable" , "animstatemachine" , "attachment" , "attachmentcosmeticvariant" , "attachmentunique" , "beam" , "behaviorstatemachine" , "behaviortree" , "bgcache" , "binaryhtml" , "bitfield" , "bulletpenetration" , "cgmediatable" , "character" , "col_map" , "com_map" , "computeshaderset" , "customizationtable" , "customizationtable_feimages" , "customizationtablecolor" , "ddl" , "destructibledef" , "entityfximpacts" , "entitysoundimpacts" , "flametable" , "font" , "fonticon" , "footsteptable" , "fx" , "game_map" , "gfx_map" , "glasses" , "image" , "impactsfxtable" , "impactsoundstable" , "keyvaluepairs" , "klf" , "laser" , "leaderboarddef" , "lensflaredef" , "lightdef" , "lightdescription" , "localize" , "locdmgtable" , "map_ents" , "maptable" , "maptableloadingimages" , "material" , "medal" , "medaltable" , "navmesh" , "navvolume" , "objective" , "objectivelist" , "physconstraints" , "physpreset" , "player_character" , "playerfxtable" , "playersoundstable" , "rawfile" , "rumble" , "sanim" , "scriptbundle" , "scriptbundlelist" , "scriptparsetree" , "sharedweaponsounds" , "shellshock" , "slug" , "snddriverglobals" , "sound" , "sound_patch" , "stringtable" , "structuredtable" , "surfacefxtable" , "surfacesounddef" , "tagfx" , "techset" , "texturecombo" , "texturelist" , "tracer" , "ttf" , "typeinfo" , "ui_map" , "umbra_tome" , "vehicle" , "vehiclefxdef" , "vehiclesounddef" , "weapon" , "weaponcamo" , "weapondef" , "weaponfull" , "weaponvariant" , "xanim" , "xcam" , "xmodel" , "xmodelalias" , "xmodelmesh" , "zbarrier" };
+
 dvar_s gDvars[] = {
 					{"ai_disableSpawn", "Disable AI from spawning", DVAR_VALUE_BOOL},
 					{"developer", "Run developer mode", DVAR_VALUE_INT, 0, 2},
@@ -1544,7 +1546,23 @@ void mlMainWindow::OnExport2BinToggleOverwriteFiles()
 
 void mlMainWindow::BuildOutputReady(QString Output)
 {
+	QStringList OutputList;
+
+	for(QString str : Output.split("\n"))
+	{
+		// we're basically just overwriting non-important messages
+		if(!str.toUpper().startsWith("WARNING:") && !str.toUpper().startsWith("ERROR:"))
+			str = "^7" + str;
+		else if(str.toUpper().startsWith("WARNING:")) // loose case when ^ isn't on the msg
+			str = "^3" + str;
+		else if(str.toUpper().startsWith("ERROR:")) // loose case when ^ isn't on the msg
+			str = "^1" + str;
+		OutputList.append(str);
+	}
+
+	Output = OutputList.join("\n");
 	QString html = Output.toHtmlEscaped();
+
 	html.replace("^0", "<font color = \"black\">");
 	html.replace("^1", "<font color = \"red\">");
 	html.replace("^2", "<font color = \"green\">");
@@ -1553,7 +1571,7 @@ void mlMainWindow::BuildOutputReady(QString Output)
 	html.replace("^5", "<font color = \"cyan\">");
 	html.replace("^6", "<font color = \"magenta\">");
 	html.replace("^7", "<font color = \"white\">");
-	html.replace("\n", "<br/>&nbsp;");
+	html.replace("\n", "<br />");
 
 	//html.replace("^8", "<font color = \"white\">");
 	//html.replace("^9", "<font color = \"white\">");
