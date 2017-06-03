@@ -185,6 +185,9 @@ protected:
 	QString mToolsPath;
 
 	QStringList mRunDvars;
+
+	int mErrorCount = 0;
+	int mWarningCount = 0;
 };
 
 class Export2BinGroupBox : public QGroupBox

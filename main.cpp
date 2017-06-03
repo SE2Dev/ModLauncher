@@ -26,7 +26,6 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("treyarch.com");
 	QCoreApplication::setOrganizationName("Treyarch");
 	QCoreApplication::setApplicationName("ModLauncher");
-//	QCoreApplication::setApplicationVersion();
 
 	mlMainWindow MainWindow;
 	MainWindow.UpdateDB();

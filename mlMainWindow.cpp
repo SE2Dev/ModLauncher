@@ -72,8 +72,7 @@ void mlBuildThread::run()
 			if (Process->waitForReadyRead(0))
 				emit OutputReady(Process->readAll());
 
-			QProcess::ProcessState State = Process->state();
-			if (State == QProcess::NotRunning)
+			if (Process->state() == QProcess::NotRunning)
 				break;
 
 			if (mCancel)
@@ -1547,20 +1546,56 @@ void mlMainWindow::OnExport2BinToggleOverwriteFiles()
 void mlMainWindow::BuildOutputReady(QString Output)
 {
 	QStringList OutputList;
+	bool wasError = false;
+	//bool wasWarning = false; // TODO if needed
 
 	for(QString str : Output.split("\n"))
 	{
-		// we're basically just overwriting non-important messages
-		if(!str.toUpper().startsWith("WARNING:") && !str.toUpper().startsWith("ERROR:"))
+		// check for warnings by the ID or the word WARNING
+		if(str.startsWith("^3") || str.toUpper().startsWith("WARNING:"))
+		{
+			// check if the warning attach is on
+			if(!str.startsWith("^3"))
+				str = "^3" + str;
+			// TODO if needed
+			//wasWarning = true;
+			//if(wasWarning)
+			mWarningCount++;
+		}
+		// check for errors by the ID or the word ERROR
+		else if(str.startsWith("^1") || str.toUpper().startsWith("ERROR:") || wasError)
+		{
+			// check if the error attach is on
+			if(!str.startsWith("^1"))
+				str = "^1" + str;
+			// so hasn't been an error so far...
+			// this is so we do not increment all the "ERROR"
+			if(!wasError)
+			{
+				// set to true
+				wasError = true;
+				// increment the error
+				mErrorCount++;
+			}
+			else
+			{
+				// search for a line where it will not be the error
+				if(str.endsWith(".zone") || str.endsWith(".d3dbsp"))
+					wasError = false;
+			}
+		}
+		else
+		{
+			// we're basically just overwriting non-important messages
 			str = "^7" + str;
-		else if(str.toUpper().startsWith("WARNING:")) // loose case when ^ isn't on the msg
-			str = "^3" + str;
-		else if(str.toUpper().startsWith("ERROR:")) // loose case when ^ isn't on the msg
-			str = "^1" + str;
+
+			wasError = false;
+			//wasWarning = false;
+		}
 		OutputList.append(str);
 	}
 
-	Output = OutputList.join("\n");
+	Output = OutputList.join("\r\n");
 	QString html = Output.toHtmlEscaped();
 
 	html.replace("^0", "<font color = \"black\">");
@@ -1584,6 +1619,8 @@ void mlMainWindow::BuildFinished()
 	mBuildButton->setText("Build");
 	mBuildThread->deleteLater();
 	mBuildThread = NULL;
+
+	BuildOutputReady(QString("Total error %1 || total warning %2").arg(mErrorCount).arg(mWarningCount));
 }
 
 Export2BinGroupBox::Export2BinGroupBox(QWidget* parent, mlMainWindow* parent_window) : QGroupBox(parent), parentWindow(parent_window)
