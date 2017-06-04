@@ -1586,9 +1586,6 @@ void mlMainWindow::BuildOutputReady(QString Output)
 		}
 		else
 		{
-			// we're basically just overwriting non-important messages
-			str = "^7" + str;
-
 			wasError = false;
 			//wasWarning = false;
 		}
@@ -1598,18 +1595,10 @@ void mlMainWindow::BuildOutputReady(QString Output)
 	Output = OutputList.join("\r\n");
 	QString html = Output.toHtmlEscaped();
 
-	html.replace("^0", "<font color = \"black\">");
-	html.replace("^1", "<font color = \"red\">");
-	html.replace("^2", "<font color = \"green\">");
-	html.replace("^3", "<font color = \"yellow\">");
-	html.replace("^4", "<font color = \"blue\">");
-	html.replace("^5", "<font color = \"cyan\">");
-	html.replace("^6", "<font color = \"magenta\">");
-	html.replace("^7", "<font color = \"white\">");
-	html.replace("\n", "<br />");
+	html.replace("^1", "<font color = \"red\">"); // error
+	html.replace("^3", "<font color = \"green\">"); // warning
 
-	//html.replace("^8", "<font color = \"white\">");
-	//html.replace("^9", "<font color = \"white\">");
+	html.replace("\n", "<br />");
 
 	mOutputWidget->appendHtml(html);
 }
