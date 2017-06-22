@@ -96,6 +96,8 @@ public:
 	void OnUGCRequestUGCDetails(SteamUGCRequestUGCDetailsResult_t* RequestDetailsResult, bool IOFailure);
 	CCallResult<mlMainWindow, SteamUGCRequestUGCDetailsResult_t> mSteamCallResultRequestDetails;
 
+	QString SteamResultMessage(EResult result);
+
 protected slots:
 	void OnFileNew();
 	void OnFileAssetEditor();

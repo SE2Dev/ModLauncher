@@ -1008,7 +1008,7 @@ void mlMainWindow::OnUGCRequestUGCDetails(SteamUGCRequestUGCDetailsResult_t* Req
 {
 	if (IOFailure || RequestDetailsResult->m_details.m_eResult != k_EResultOK)
 	{
-		QMessageBox::warning(this, "Error", "Error retrieving item data from the Steam Workshop.");
+		QMessageBox::warning(this, "Error", QString("Error retrieving item data from the Steam Workshop. Error %1: %2.").arg((int)RequestDetailsResult->m_details.m_eResult).arg(SteamResultMessage(RequestDetailsResult->m_details.m_eResult)));
 		return;
 	}
 
@@ -1282,6 +1282,12 @@ void mlMainWindow::UpdateWorkshopItem()
 		return;
 	}
 
+	if(!QFile(mThumbnail).open(QIODevice::ReadOnly))
+	{
+		QMessageBox::warning(this, "Error", QString("Error cannot find thumbnail '%1'.").arg(mThumbnail));
+		return;
+	}
+
 	File.write(QJsonDocument(Root).toJson());
 	File.close();
 
@@ -1345,7 +1351,7 @@ void mlMainWindow::OnCreateItemResult(CreateItemResult_t* CreateItemResult, bool
 
 	if (CreateItemResult->m_eResult != k_EResultOK)
 	{
-		QMessageBox::warning(this, "Error", "Error creating Steam Workshop item. Error code: " + CreateItemResult->m_eResult);
+		QMessageBox::warning(this, "Error", QString("Error creating Steam Workshop item. Error %1: %2.").arg((int)CreateItemResult->m_eResult).arg(SteamResultMessage(CreateItemResult->m_eResult)));
 		return;
 	}
 
@@ -1364,12 +1370,219 @@ void mlMainWindow::OnUpdateItemResult(SubmitItemUpdateResult_t* UpdateItemResult
 
 	if (UpdateItemResult->m_eResult != k_EResultOK)
 	{
-		QMessageBox::warning(this, "Error", "Error updating Steam Workshop item. Error code: " + UpdateItemResult->m_eResult);
+		QMessageBox::warning(this, "Error", QString("Error updating Steam Workshop item. Error %1: %2.").arg((int)UpdateItemResult->m_eResult).arg(SteamResultMessage(UpdateItemResult->m_eResult)));
 		return;
 	}
 
 	if (QMessageBox::question(this, "Update", "Workshop item successfully updated. Do you want to visit the Workshop page for this item now?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 		ShellExecute(NULL, "open", QString("steam://url/CommunityFilePage/%1").arg(QString::number(mFileId)).toLatin1().constData(), "", NULL, SW_SHOWDEFAULT);
+}
+
+QString mlMainWindow::SteamResultMessage(EResult result)
+{
+	switch(result)
+	{
+	case k_EResultOK:
+		return "k_EResultOK";
+	case k_EResultFail:
+		return "Generic failure";
+	case k_EResultNoConnection:
+		return "No network connection";
+	case k_EResultInvalidPassword:
+		return "k_EResultInvalidPassword";
+	case k_EResultLoggedInElsewhere:
+		return "User logged in somewhere else";
+	case k_EResultInvalidProtocolVer:
+		return "k_EResultInvalidProtocolVer";
+	case k_EResultInvalidParam:
+		return "A parameter was invalid";
+	case k_EResultFileNotFound:
+		return "A file was not found";
+	case k_EResultBusy:
+		return "k_EResultBusy";
+	case k_EResultInvalidState:
+		return "Invalid State";
+	case k_EResultInvalidName:
+		return "k_EResultInvalidName";
+	case k_EResultInvalidEmail:
+		return "k_EResultInvalidEmail";
+	case k_EResultDuplicateName:
+		return "Duplicate name";
+	case k_EResultAccessDenied:
+		return "Access denied";
+	case k_EResultTimeout:
+		return "Operation timed out";
+	case k_EResultBanned:
+		return "k_EResultBanned";
+	case k_EResultAccountNotFound:
+		return "k_EResultAccountNotFound";
+	case k_EResultInvalidSteamID:
+		return "k_EResultInvalidSteamID";
+	case k_EResultServiceUnavailable:
+		return "Service unavailable";
+	case k_EResultNotLoggedOn:
+		return "k_EResultNotLoggedOn";
+	case k_EResultPending:
+		return "k_EResultPending";
+	case k_EResultEncryptionFailure:
+		return "k_EResultEncryptionFailure";
+	case k_EResultInsufficientPrivilege:
+		return "Insufficient privilege";
+	case k_EResultLimitExceeded:
+		return "k_EResultLimitExceeded";
+	case k_EResultRevoked:
+		return "k_EResultRevoked";
+	case k_EResultExpired:
+		return "k_EResultExpired";
+	case k_EResultAlreadyRedeemed:
+		return "k_EResultAlreadyRedeemed";
+	case k_EResultDuplicateRequest:
+		return "k_EResultDuplicateRequest";
+	case k_EResultAlreadyOwned:
+		return "k_EResultAlreadyOwned";
+	case k_EResultIPNotFound:
+		return "k_EResultIPNotFound";
+	case k_EResultPersistFailed:
+		return "k_EResultPersistFailed";
+	case k_EResultLockingFailed:
+		return "k_EResultLockingFailed";
+	case k_EResultLogonSessionReplaced:
+		return "k_EResultLogonSessionReplaced";
+	case k_EResultConnectFailed:
+		return "k_EResultConnectFailed";
+	case k_EResultHandshakeFailed:
+		return "k_EResultHandshakeFailed";
+	case k_EResultIOFailure:
+		return "k_EResultIOFailure";
+	case k_EResultRemoteDisconnect:
+		return "k_EResultRemoteDisconnect";
+	case k_EResultShoppingCartNotFound:
+		return "k_EResultShoppingCartNotFound";
+	case k_EResultBlocked:
+		return "k_EResultBlocked";
+	case k_EResultIgnored:
+		return "k_EResultIgnored";
+	case k_EResultNoMatch:
+		return "k_EResultNoMatch";
+	case k_EResultAccountDisabled:
+		return "k_EResultAccountDisabled";
+	case k_EResultServiceReadOnly:
+		return "k_EResultServiceReadOnly";
+	case k_EResultAccountNotFeatured:
+		return "k_EResultAccountNotFeatured";
+	case k_EResultAdministratorOK:
+		return "k_EResultAdministratorOK";
+	case k_EResultContentVersion:
+		return "k_EResultContentVersion";
+	case k_EResultTryAnotherCM:
+		return "k_EResultTryAnotherCM";
+	case k_EResultPasswordRequiredToKickSession:
+		return "k_EResultPasswordRequiredToKickSession";
+	case k_EResultAlreadyLoggedInElsewhere:
+		return "k_EResultAlreadyLoggedInElsewhere";
+	case k_EResultSuspended:
+		return "k_EResultSuspended";
+	case k_EResultCancelled:
+		return "k_EResultCancelled";
+	case k_EResultDataCorruption:
+		return "k_EResultDataCorruption";
+	case k_EResultDiskFull:
+		return "k_EResultDiskFull";
+	case k_EResultRemoteCallFailed:
+		return "k_EResultRemoteCallFailed";
+	case k_EResultPasswordUnset:
+		return "k_EResultPasswordUnset";
+	case k_EResultExternalAccountUnlinked:
+		return "k_EResultExternalAccountUnlinked";
+	case k_EResultPSNTicketInvalid:
+		return "k_EResultPSNTicketInvalid";
+	case k_EResultExternalAccountAlreadyLinked:
+		return "k_EResultExternalAccountAlreadyLinked";
+	case k_EResultRemoteFileConflict:
+		return "k_EResultRemoteFileConflict";
+	case k_EResultIllegalPassword:
+		return "k_EResultIllegalPassword";
+	case k_EResultSameAsPreviousValue:
+		return "k_EResultSameAsPreviousValue";
+	case k_EResultAccountLogonDenied:
+		return "k_EResultAccountLogonDenied";
+	case k_EResultCannotUseOldPassword:
+		return "k_EResultCannotUseOldPassword";
+	case k_EResultInvalidLoginAuthCode:
+		return "k_EResultInvalidLoginAuthCode";
+	case k_EResultAccountLogonDeniedNoMail:
+		return "k_EResultAccountLogonDeniedNoMail";
+	case k_EResultHardwareNotCapableOfIPT:
+		return "k_EResultHardwareNotCapableOfIPT";
+	case k_EResultIPTInitError:
+		return "k_EResultIPTInitError";
+	case k_EResultParentalControlRestricted:
+		return "k_EResultParentalControlRestricted";
+	case k_EResultFacebookQueryError:
+		return "k_EResultFacebookQueryError";
+	case k_EResultExpiredLoginAuthCode:
+		return "k_EResultExpiredLoginAuthCode";
+	case k_EResultIPLoginRestrictionFailed:
+		return "k_EResultIPLoginRestrictionFailed";
+	case k_EResultAccountLockedDown:
+		return "k_EResultAccountLockedDown";
+	case k_EResultAccountLogonDeniedVerifiedEmailRequired:
+		return "k_EResultAccountLogonDeniedVerifiedEmailRequired";
+	case k_EResultNoMatchingURL:
+		return "k_EResultNoMatchingURL";
+	case k_EResultBadResponse:
+		return "k_EResultBadResponse";
+	case k_EResultRequirePasswordReEntry:
+		return "k_EResultRequirePasswordReEntry";
+	case k_EResultValueOutOfRange:
+		return "k_EResultValueOutOfRange";
+	case k_EResultUnexpectedError:
+		return "Unexpected error";
+	case k_EResultDisabled:
+		return "k_EResultDisabled";
+	case k_EResultInvalidCEGSubmission:
+		return "k_EResultInvalidCEGSubmission";
+	case k_EResultRestrictedDevice:
+		return "k_EResultRestrictedDevice";
+	case k_EResultRegionLocked:
+		return "k_EResultRegionLocked";
+	case k_EResultRateLimitExceeded:
+		return "k_EResultRateLimitExceeded";
+	case k_EResultAccountLoginDeniedNeedTwoFactor:
+		return "k_EResultAccountLoginDeniedNeedTwoFactor";
+	case k_EResultItemDeleted:
+		return "Item has been deleted";
+	case k_EResultAccountLoginDeniedThrottle:
+		return "k_EResultAccountLoginDeniedThrottle";
+	case k_EResultTwoFactorCodeMismatch:
+		return "k_EResultTwoFactorCodeMismatch";
+	case k_EResultTwoFactorActivationCodeMismatch:
+		return "k_EResultTwoFactorActivationCodeMismatch";
+	case k_EResultAccountAssociatedToMultiplePartners:
+		return "k_EResultAccountAssociatedToMultiplePartners";
+	case k_EResultNotModified:
+		return "Item was not modified";
+	case k_EResultNoMobileDevice:
+		return "k_EResultNoMobileDevice";
+	case k_EResultTimeNotSynced:
+		return "k_EResultTimeNotSynced";
+	case k_EResultSmsCodeFailed:
+		return "k_EResultSmsCodeFailed";
+	case k_EResultAccountLimitExceeded:
+		return "k_EResultAccountLimitExceeded";
+	case k_EResultAccountActivityLimitExceeded:
+		return "k_EResultAccountActivityLimitExceeded";
+	case k_EResultPhoneActivityLimitExceeded:
+		return "k_EResultPhoneActivityLimitExceeded";
+	case k_EResultRefundToWallet:
+		return "k_EResultRefundToWallet";
+	case k_EResultEmailSendFailure:
+		return "k_EResultEmailSendFailure";
+	case k_EResultNotSettled:
+		return "k_EResultNotSettled";
+	default:
+		return "Unknown Error";
+	}
 }
 
 void mlMainWindow::OnHelpAbout()
